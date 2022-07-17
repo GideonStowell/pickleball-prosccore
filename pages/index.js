@@ -1,8 +1,93 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import Image from "next/image";
+import styles from "../styles/Home.module.css";
+import React from "react";
+
+const TEAM_A_ID = "A";
+const TEAM_B_ID = "B";
+const FIRST_SERVER = 1;
+const SECOND_SERVER = 2;
+
+// Build the actions that will get recorded into the historical graph
+const SIDEOUT = "sideout";
+const CHANGE_SERVER = "change_server";
+const POINT = "point";
 
 export default function Home() {
+  const [teamAScore, setTeamAScore] = React.useState(0);
+  const [teamBScore, setTeamBScore] = React.useState(0);
+  const [servingTeamScore, setServingTeamScore] = React.useState(0);
+  const [servingTeam, setServingTeam] = React.useState(TEAM_A_ID);
+  const [receivingTeamScore, setReceivingTeamScore] = React.useState(0);
+  const [serverNumber, setServerNumber] = React.useState(SECOND_SERVER);
+
+  const addPoint = () => {
+    console.log("Add point");
+    let newScore = servingTeamScore + 1;
+    setServingTeamScore(newScore);
+    switch (servingTeam) {
+      case TEAM_A_ID:
+        console.log("Inc team A");
+        setTeamAScore(newScore);
+        break;
+      case TEAM_B_ID:
+        console.log("Inc team B");
+        setTeamBScore(newScore);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const sideOut = () => {
+    // Switch the serving team
+    // Switch their scores on the scoreboard
+    // Set server to number 1
+    setServerNumber(FIRST_SERVER);
+
+    switch (servingTeam) {
+      case TEAM_A_ID:
+        console.log("Switch to B");
+        setServingTeamScore(teamBScore);
+        setReceivingTeamScore(teamAScore);
+        setServingTeam(TEAM_B_ID);
+        break;
+      case TEAM_B_ID:
+        console.log("Switch to A");
+        setServingTeamScore(teamAScore);
+        setReceivingTeamScore(teamBScore);
+        setServingTeam(TEAM_A_ID);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const changeServer = () => {
+    // Logic for when we change server or sideout (aka error by servering team)
+    switch (serverNumber) {
+      case FIRST_SERVER:
+        setServerNumber(SECOND_SERVER);
+        break;
+      case SECOND_SERVER:
+        sideOut();
+        break;
+      default:
+        console.error("Unknown state in changeServer()");
+        break;
+    }
+  };
+
+  const resetGame = () => {
+    // Reset the game to the initial starting postions
+    setTeamBScore(0);
+    setTeamAScore(0);
+    setServingTeamScore(0);
+    setReceivingTeamScore(0);
+    setServingTeam(TEAM_A_ID);
+    setServerNumber(SECOND_SERVER);
+  };
+
   return (
     <div className={styles.container}>
       <Head>
@@ -12,43 +97,32 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        <h1 className={styles.title}>Score</h1>
 
         <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
+          <h2>Serving Team: {servingTeam}</h2>
+          <button onClick={() => addPoint()}> Point</button>
+          score: {servingTeamScore} - {receivingTeamScore} - {serverNumber}
+          <button onClick={() => changeServer()}>
+            {serverNumber == FIRST_SERVER ? `Change server` : `Sideout`}
+          </button>
+          <button>Undo Last</button>
+          <button onClick={() => resetGame()}>Reset All</button>
         </p>
-
         <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+          <p className={styles.card}>
+            <h2>Team A: {teamAScore}</h2>
+            <span>
+              Find in-depth information about Next.js features and API.
+            </span>
+          </p>
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+          <p className={styles.card}>
+            <h2>Team B: {teamBScore}</h2>
+            <span>
+              Learn about Next.js in an interactive course with quizzes!
+            </span>
+          </p>
         </div>
       </main>
 
@@ -58,12 +132,12 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <span className={styles.logo}>
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
         </a>
       </footer>
     </div>
-  )
+  );
 }
