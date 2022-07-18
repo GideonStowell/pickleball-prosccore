@@ -116,8 +116,8 @@ export default function Home() {
           </div>
           <div className={styles.scoreboard}>
             <button className={styles.button} onClick={() => changeServer()}>
-            {serverNumber == FIRST_SERVER ? `Change server` : `Sideout`}
-          </button>
+              {serverNumber == FIRST_SERVER ? `Change Server` : `Sideout`}
+            </button>
           </div>
           <div className={styles.scoreboard}>
             <button disabled className={styles.button}>
