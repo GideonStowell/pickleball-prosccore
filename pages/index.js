@@ -7,6 +7,8 @@ const TEAM_A_ID = "A";
 const TEAM_B_ID = "B";
 const FIRST_SERVER = 1;
 const SECOND_SERVER = 2;
+const GREEN_HIGHLIGHT = "#4aba68";
+const GREEN_BORDER = "#28803f";
 
 // Build the actions that will get recorded into the historical graph
 const SIDEOUT = "sideout";
@@ -110,19 +112,27 @@ export default function Home() {
           <button onClick={() => resetGame()}>Reset All</button>
         </p>
         <div className={styles.grid}>
-          <p className={styles.card}>
+          <a
+            className={styles.card}
+            style={{
+              backgroundColor: servingTeam == TEAM_A_ID ? GREEN_HIGHLIGHT : "",
+              borderColor: servingTeam == TEAM_A_ID ? GREEN_BORDER : "",
+            }}
+          >
             <h2>Team A: {teamAScore}</h2>
-            <span>
-              Find in-depth information about Next.js features and API.
-            </span>
-          </p>
+            <p>{servingTeam == TEAM_A_ID ? "Serving" : ""}</p>
+          </a>
 
-          <p className={styles.card}>
+          <a
+            className={styles.card}
+            style={{
+              backgroundColor: servingTeam == TEAM_B_ID ? GREEN_HIGHLIGHT : "",
+              borderColor: servingTeam == TEAM_B_ID ? GREEN_BORDER : "",
+            }}
+          >
             <h2>Team B: {teamBScore}</h2>
-            <span>
-              Learn about Next.js in an interactive course with quizzes!
-            </span>
-          </p>
+            <p>{servingTeam == TEAM_B_ID ? "Serving" : ""}</p>
+          </a>
         </div>
       </main>
 
