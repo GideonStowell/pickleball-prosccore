@@ -2,6 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import React from "react";
+import gameGraph from "../services/game_graph";
 
 const TEAM_A_ID = "A";
 const TEAM_B_ID = "B";
@@ -14,6 +15,7 @@ const GREEN_BORDER = "#28803f";
 const SIDEOUT = "sideout";
 const CHANGE_SERVER = "change_server";
 const POINT = "point";
+const game = new gameGraph();
 
 export default function Home() {
   const [teamAScore, setTeamAScore] = React.useState(0);
@@ -24,16 +26,17 @@ export default function Home() {
   const [serverNumber, setServerNumber] = React.useState(SECOND_SERVER);
 
   const addPoint = () => {
-    console.log("Add point");
+    // console.log("Add point");
+    game.point();
     let newScore = servingTeamScore + 1;
     setServingTeamScore(newScore);
     switch (servingTeam) {
       case TEAM_A_ID:
-        console.log("Inc team A");
+        // console.log("Inc team A");
         setTeamAScore(newScore);
         break;
       case TEAM_B_ID:
-        console.log("Inc team B");
+        // console.log("Inc team B");
         setTeamBScore(newScore);
         break;
       default:
@@ -45,17 +48,19 @@ export default function Home() {
     // Switch the serving team
     // Switch their scores on the scoreboard
     // Set server to number 1
+    // update game object
     setServerNumber(FIRST_SERVER);
+    game.sideout();
 
     switch (servingTeam) {
       case TEAM_A_ID:
-        console.log("Switch to B");
+        // console.log("Switch to B");
         setServingTeamScore(teamBScore);
         setReceivingTeamScore(teamAScore);
         setServingTeam(TEAM_B_ID);
         break;
       case TEAM_B_ID:
-        console.log("Switch to A");
+        // console.log("Switch to A");
         setServingTeamScore(teamAScore);
         setReceivingTeamScore(teamBScore);
         setServingTeam(TEAM_A_ID);
@@ -69,6 +74,7 @@ export default function Home() {
     // Logic for when we change server or sideout (aka error by servering team)
     switch (serverNumber) {
       case FIRST_SERVER:
+        game.changeServer();
         setServerNumber(SECOND_SERVER);
         break;
       case SECOND_SERVER:
@@ -120,7 +126,11 @@ export default function Home() {
             </button>
           </div>
           <div className={styles.scoreboard}>
-            <button disabled className={styles.button}>
+            <button
+              className={styles.button}
+              // onClick={() => game.print()}
+              disabled
+            >
               Undo Last
             </button>
           </div>
@@ -134,8 +144,9 @@ export default function Home() {
           <a
             className={styles.card}
             style={{
-              backgroundColor: servingTeam == TEAM_A_ID ? GREEN_HIGHLIGHT : "",
-              borderColor: servingTeam == TEAM_A_ID ? GREEN_BORDER : "",
+              backgroundColor:
+                servingTeam == TEAM_A_ID ? GREEN_HIGHLIGHT : null,
+              borderColor: servingTeam == TEAM_A_ID ? GREEN_BORDER : null,
             }}
           >
             <h2>Team A: {teamAScore}</h2>
@@ -145,8 +156,9 @@ export default function Home() {
           <a
             className={styles.card}
             style={{
-              backgroundColor: servingTeam == TEAM_B_ID ? GREEN_HIGHLIGHT : "",
-              borderColor: servingTeam == TEAM_B_ID ? GREEN_BORDER : "",
+              backgroundColor:
+                servingTeam == TEAM_B_ID ? GREEN_HIGHLIGHT : null,
+              borderColor: servingTeam == TEAM_B_ID ? GREEN_BORDER : null,
             }}
           >
             <h2>Team B: {teamBScore}</h2>
