@@ -1,9 +1,12 @@
 name: deploy nexturl to vercel
 on:
   push:
-    - master
+    branches: [master]
+    paths-ignore:
+      - "**/README.md"
+      - "/github/workflows"
   pull-request:
-    - master
+
 jobs:
   vercel:
     runs-on: ubuntu-latest
