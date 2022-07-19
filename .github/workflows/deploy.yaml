@@ -1,0 +1,27 @@
+name: deploy nexturl to vercel
+on:
+  push:
+    - master
+  pull-request:
+    - master
+jobs:
+  vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      #add env file to .env.local
+      - name: Set Env Vars on Vercel Project
+        uses: dkershner6/vercel-set-env-action@v1
+        with:
+          token: ${{ secrets.VERCEL_TOKEN }}
+          teamId: ${{ secrets.VERCEL_TEAM_ID }} # optional, without will use personal
+
+      # deploy app to vercel
+      - name: deploy site to vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
+          github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
+          vercel-args: "--prod" #Optional
+          vercel-org-id: ${{ secrets.ORG_ID}} #Required
+          vercel-project-id: ${{ secrets.PROJECT_ID}} #Required
