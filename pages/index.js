@@ -102,7 +102,7 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>Pickleball (test) Proscore</h1>
+        <h1 className={styles.title}>Pickleball Proscore</h1>
 
         <div className={styles.description}>
           <h2>
