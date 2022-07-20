@@ -2,7 +2,7 @@ const SIDEOUT = "sideout";
 const CHANGE_SERVER = "change_server";
 const POINT = "point";
 
-module.exports = function gameGraph() {
+function gameGraph() {
   this.data = [];
 
   const getNode = node_action => {
@@ -22,6 +22,7 @@ module.exports = function gameGraph() {
     return this.data.pop();
   };
   this.reset = () => {
+    this.data.length = 0;
     return;
   };
   this.print = () => {
@@ -32,4 +33,6 @@ module.exports = function gameGraph() {
     // Goal is to get true or false for a valid graph and then the readable score
     return false, null;
   };
-};
+}
+
+module.exports = { SIDEOUT, CHANGE_SERVER, POINT, gameGraph };
