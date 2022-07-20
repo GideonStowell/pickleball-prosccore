@@ -2,7 +2,12 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import React from "react";
-import gameGraph from "../services/game_graph";
+import {
+  SIDEOUT,
+  POINT,
+  CHANGE_SERVER,
+  gameGraph,
+} from "../services/game_graph";
 
 const TEAM_A_ID = "A";
 const TEAM_B_ID = "B";
@@ -11,10 +16,7 @@ const SECOND_SERVER = 2;
 const GREEN_HIGHLIGHT = "#4aba68";
 const GREEN_BORDER = "#28803f";
 
-// Build the actions that will get recorded into the historical graph
-const SIDEOUT = "sideout";
-const CHANGE_SERVER = "change_server";
-const POINT = "point";
+// Game graph represents the plays in the game
 const game = new gameGraph();
 
 export default function Home() {
@@ -24,20 +26,25 @@ export default function Home() {
   const [servingTeam, setServingTeam] = React.useState(TEAM_A_ID);
   const [receivingTeamScore, setReceivingTeamScore] = React.useState(0);
   const [serverNumber, setServerNumber] = React.useState(SECOND_SERVER);
+  const [gameScoreCap, setGameScoreCap] = React.useState(11);
 
   const addPoint = () => {
     // console.log("Add point");
     game.point();
     let newScore = servingTeamScore + 1;
-    setServingTeamScore(newScore);
+    setScore(newScore);
+  };
+
+  const setScore = score => {
+    setServingTeamScore(score);
     switch (servingTeam) {
       case TEAM_A_ID:
         // console.log("Inc team A");
-        setTeamAScore(newScore);
+        setTeamAScore(score);
         break;
       case TEAM_B_ID:
         // console.log("Inc team B");
-        setTeamBScore(newScore);
+        setTeamBScore(score);
         break;
       default:
         break;
@@ -50,8 +57,10 @@ export default function Home() {
     // Set server to number 1
     // update game object
     setServerNumber(FIRST_SERVER);
-    game.sideout();
+    switchDisplayedScores();
+  };
 
+  const switchDisplayedScores = () => {
     switch (servingTeam) {
       case TEAM_A_ID:
         // console.log("Switch to B");
@@ -71,17 +80,46 @@ export default function Home() {
   };
 
   const changeServer = () => {
-    // Logic for when we change server or sideout (aka error by servering team)
+    // Logic for when we change server or sideout (aka error by serving team)
     switch (serverNumber) {
       case FIRST_SERVER:
         game.changeServer();
         setServerNumber(SECOND_SERVER);
         break;
       case SECOND_SERVER:
+        game.sideout();
         sideOut();
         break;
       default:
         console.error("Unknown state in changeServer()");
+        break;
+    }
+  };
+
+  const undoLast = () => {
+    // For when you accidently click something you shouldn't have
+    const last_move =
+      game.data.length > 0 ? Object.keys(game.undo())[0] : undefined;
+
+    switch (last_move) {
+      case SIDEOUT:
+        // To undo a sideout we can just force another sideout
+        setServerNumber(SECOND_SERVER);
+        switchDisplayedScores();
+        break;
+      case CHANGE_SERVER:
+        // To undo a changed server just set the server back to server 1
+        setServerNumber(FIRST_SERVER);
+        break;
+      case POINT:
+        // Undo a point by subtracting a point from the serving team
+        console.log("undo");
+
+        setScore(servingTeamScore - 1);
+        break;
+      default:
+        // Game state returns anythign else don't do anything
+        console.log("Nothing to undo");
         break;
     }
   };
@@ -94,6 +132,7 @@ export default function Home() {
     setReceivingTeamScore(0);
     setServingTeam(TEAM_A_ID);
     setServerNumber(SECOND_SERVER);
+    game.reset();
   };
 
   return (
@@ -111,6 +150,39 @@ export default function Home() {
         <h1 className={styles.title}>Pickleball Proscore</h1>
 
         <div className={styles.description}>
+          <div className={styles.scoreboard}>
+            {/* Rewrite this as a map */}
+            <button
+              style={{
+                backgroundColor: gameScoreCap == 11 ? GREEN_HIGHLIGHT : null,
+              }}
+              value={11}
+              className={styles.button}
+              onClick={e => setGameScoreCap(e.target.value)}
+            >
+              11
+            </button>
+            <button
+              style={{
+                backgroundColor: gameScoreCap == 15 ? GREEN_HIGHLIGHT : null,
+              }}
+              value={15}
+              className={styles.button}
+              onClick={e => setGameScoreCap(e.target.value)}
+            >
+              15
+            </button>
+            <button
+              style={{
+                backgroundColor: gameScoreCap == 21 ? GREEN_HIGHLIGHT : null,
+              }}
+              value={21}
+              className={styles.button}
+              onClick={e => setGameScoreCap(e.target.value)}
+            >
+              21
+            </button>
+          </div>
           <h2>
             {servingTeamScore} - {receivingTeamScore} - {serverNumber}
           </h2>
@@ -128,8 +200,8 @@ export default function Home() {
           <div className={styles.scoreboard}>
             <button
               className={styles.button}
-              // onClick={() => game.print()}
-              disabled
+              onClick={() => undoLast()}
+              // disabled
             >
               Undo Last
             </button>
