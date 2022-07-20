@@ -38,7 +38,7 @@ export default function Home() {
     if (score >= gameScoreCap && difference >= 2) {
       setTimeout(() => {
         alert(
-          `Game over!\n Team ${servingTeamScore} has won, ${
+          `Game over!\n Team ${servingTeam} has won, ${
             servingTeamScore + 1
           }-${receivingTeamScore}`
         );
