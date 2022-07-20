@@ -15,6 +15,7 @@ const FIRST_SERVER = 1;
 const SECOND_SERVER = 2;
 const GREEN_HIGHLIGHT = "#4aba68";
 const GREEN_BORDER = "#28803f";
+const SCORE_CAPS = [11, 15, 21];
 
 // Game graph represents the plays in the game
 const game = new gameGraph();
@@ -28,11 +29,29 @@ export default function Home() {
   const [serverNumber, setServerNumber] = React.useState(SECOND_SERVER);
   const [gameScoreCap, setGameScoreCap] = React.useState(11);
 
+  const checkIfGameIsOver = score => {
+    // Rules are:
+    // if the servingTeamScore is greater than or equal to cap score
+    // AND
+    // (newscore - other team score) is greater than or equal to 2
+    const difference = score - receivingTeamScore;
+    if (score >= gameScoreCap && difference >= 2) {
+      setTimeout(() => {
+        alert(
+          `Game over!\n Team ${servingTeamScore} has won, ${
+            servingTeamScore + 1
+          }-${receivingTeamScore}`
+        );
+      }, 1);
+    }
+  };
+
   const addPoint = () => {
     // console.log("Add point");
     game.point();
     let newScore = servingTeamScore + 1;
     setScore(newScore);
+    checkIfGameIsOver(newScore);
   };
 
   const setScore = score => {
@@ -134,6 +153,16 @@ export default function Home() {
     setServerNumber(SECOND_SERVER);
     game.reset();
   };
+  const BUTTON_CONFIGS = [
+    { text: "Point", onClick: addPoint, other: "hi" },
+    {
+      text: serverNumber == FIRST_SERVER ? "Change Server" : "Sideout",
+      onClick: changeServer,
+      other: "help",
+    },
+    { text: "Undo Last", onClick: undoLast, other: "Hi" },
+    { text: "Reset Game", onClick: resetGame, other: "help" },
+  ];
 
   return (
     <div className={styles.container}>
@@ -151,66 +180,33 @@ export default function Home() {
 
         <div className={styles.description}>
           <div className={styles.scoreboard}>
-            {/* Rewrite this as a map */}
-            <button
-              style={{
-                backgroundColor: gameScoreCap == 11 ? GREEN_HIGHLIGHT : null,
-              }}
-              value={11}
-              className={styles.button}
-              onClick={e => setGameScoreCap(e.target.value)}
-            >
-              11
-            </button>
-            <button
-              style={{
-                backgroundColor: gameScoreCap == 15 ? GREEN_HIGHLIGHT : null,
-              }}
-              value={15}
-              className={styles.button}
-              onClick={e => setGameScoreCap(e.target.value)}
-            >
-              15
-            </button>
-            <button
-              style={{
-                backgroundColor: gameScoreCap == 21 ? GREEN_HIGHLIGHT : null,
-              }}
-              value={21}
-              className={styles.button}
-              onClick={e => setGameScoreCap(e.target.value)}
-            >
-              21
-            </button>
+            {SCORE_CAPS.map((item, i) => (
+              <button
+                key={i}
+                style={{
+                  backgroundColor:
+                    gameScoreCap == item ? GREEN_HIGHLIGHT : null,
+                  borderColor: gameScoreCap == item ? GREEN_BORDER : null,
+                }}
+                value={item}
+                className={styles.button}
+                onClick={() => setGameScoreCap(item)}
+              >
+                {item}
+              </button>
+            ))}
           </div>
           <h2>
             {servingTeamScore} - {receivingTeamScore} - {serverNumber}
           </h2>
 
-          <div className={styles.scoreboard}>
-            <button className={styles.button} onClick={() => addPoint()}>
-              Point
-            </button>
-          </div>
-          <div className={styles.scoreboard}>
-            <button className={styles.button} onClick={() => changeServer()}>
-              {serverNumber == FIRST_SERVER ? `Change Server` : `Sideout`}
-            </button>
-          </div>
-          <div className={styles.scoreboard}>
-            <button
-              className={styles.button}
-              onClick={() => undoLast()}
-              // disabled
-            >
-              Undo Last
-            </button>
-          </div>
-          <div className={styles.scoreboard}>
-            <button className={styles.button} onClick={() => resetGame()}>
-              Reset Game
-            </button>
-          </div>
+          {BUTTON_CONFIGS.map((item, i) => (
+            <div key={i} className={styles.scoreboard}>
+              <button className={styles.button} onClick={() => item.onClick()}>
+                {item.text}
+              </button>
+            </div>
+          ))}
         </div>
         <div className={styles.grid}>
           <a
